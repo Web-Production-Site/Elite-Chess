@@ -1,186 +1,119 @@
 // ==========================================
-// ملف منطق اللعبة والذكاء الاصطناعي (كامل)
+// ملف إدارة شاشات البداية والنهاية (كامل)
 // ==========================================
 
-var game = new Chess();
-var selectedSquare = null;
+let playerColor = 'w';
+let gameStarted = false;
 
-var board = Chessboard('board-container', {
-    draggable: true,
-    position: 'start',
-    pieceTheme: 'img/chesspieces/wikipedia/{piece}.png',
+const pawnColors = [
+    'rgba(200, 200, 200, 0.6)',
+    'rgba(255, 255, 255, 0.4)',
+    'rgba(0, 0, 0, 0.6)',
+    'rgba(255, 255, 255, 0.8)'
+];
+
+const pawnSVG = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="COLOR" stroke="STROKE" stroke-width="1.5"/></svg>';
+
+function changePawnColor() {
+    const randomColor = pawnColors[Math.floor(Math.random() * pawnColors.length)];
+    const strokeColor = randomColor.includes('0, 0, 0') ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)';
     
-    onDragStart: function(source, piece) {
-        if (game.game_over()) return false;
-        if (playerColor === 'w' && piece.search(/^b/) !== -1) return false;
-        if (playerColor === 'b' && piece.search(/^w/) !== -1) return false;
-        
-        removeMoveIndicators();
-        selectedSquare = null;
-        return true;
-    },
-    
-    onDrop: function(source, target) {
-        var move = game.move({
-            from: source,
-            to: target,
-            promotion: 'q'
+    const svg = pawnSVG.replace(/COLOR/g, randomColor).replace(/STROKE/g, strokeColor);
+    $('#start-pawn').css('background-image', `url('${svg}')`);
+}
+
+setInterval(changePawnColor, 3000);
+changePawnColor();
+
+$('#start-screen').on('click', function() {
+    if (!gameStarted) {
+        $(this).fadeOut(300, function() {
+            $('#color-selection').fadeIn(300);
         });
-        
-        if (move === null) return 'snapback';
-        
-        // تشغيل صوت الحركة الرقمي
-        if (typeof playMoveSound === 'function') playMoveSound();
-        
-        removeMoveIndicators();
-        selectedSquare = null;
-        
-        if (!game.game_over()) {
-            setTimeout(makeAyanokojiMove, 300);
-        } else {
-            updateCheckStatus();
-        }
-    },
-    
-    onSnapEnd: function() {
-        board.position(game.fen());
     }
 });
 
-// ====== النقر على المربعات ======
-$(document).on('click', '.square-55d63', function(e) {
-    if (board.dragging && board.dragging()) return;
-    
-    var square = $(this).data('square');
-    if (!square) return;
-    
-    var piece = game.get(square);
-    
-    // 1. النقر على نقطة حركة
-    if (selectedSquare && $(this).is('.move-normal, .move-capture, .move-castle')) {
-        var move = game.move({
-            from: selectedSquare,
-            to: square,
-            promotion: 'q'
-        });
-        
-        if (move !== null) {
-            if (typeof playMoveSound === 'function') playMoveSound();
-            
-            board.position(game.fen());
-            removeMoveIndicators();
-            selectedSquare = null;
-            
-            if (!game.game_over()) {
-                setTimeout(makeAyanokojiMove, 300);
-            } else {
-                updateCheckStatus();
-            }
-            return;
-        }
-    }
-    
-    // 2. النقر على قطعة اللاعب
-    if (piece && piece.color === playerColor) {
-        if (selectedSquare === square) {
-            selectedSquare = null;
-            removeMoveIndicators();
-        } else {
-            selectedSquare = square;
-            showPossibleMoves(square);
-        }
-        return;
-    }
-    
-    // 3. إلغاء التحديد
-    selectedSquare = null;
-    removeMoveIndicators();
+$('#white-option').on('click', function() {
+    startGame('w');
 });
 
-function showPossibleMoves(square) {
-    removeMoveIndicators();
-    var moves = game.moves({ square: square, verbose: true });
-    if (moves.length === 0) return;
-    
-    for (var i = 0; i < moves.length; i++) {
-        var move = moves[i];
-        var $targetSquare = $('.square-' + move.to);
-        
-        if (move.flags.indexOf('k') !== -1 || move.flags.indexOf('q') !== -1) {
-            $targetSquare.addClass('move-castle');
-        } else if (move.flags.indexOf('c') !== -1 || move.flags.indexOf('e') !== -1) {
-            $targetSquare.addClass('move-capture');
-        } else {
-            $targetSquare.addClass('move-normal');
-        }
-    }
-}
+$('#black-option').on('click', function() {
+    startGame('b');
+});
 
-function removeMoveIndicators() {
-    $('.square-55d63').removeClass('move-normal move-capture move-castle in-check in-checkmate');
-}
-
-// ====== دور أيانوكوجي ======
-function makeAyanokojiMove() {
-    $('#ayanokoji-thinking').addClass('active');
-    $('.ayanokoji-profile').addClass('thinking');
+function startGame(color) {
+    playerColor = color;
+    gameStarted = true;
     
-    setTimeout(function() {
-        var bestMove = getBestMove(game, 4000);
+    // ✅ تهيئة صوت أيانوكوجي العشوائي للمباراة الجديدة
+    if (typeof initNewGameVoice === 'function') initNewGameVoice();
+    if (typeof resetAyanokojiVoice === 'function') resetAyanokojiVoice();
+    
+    $('#color-selection').fadeOut(300, function() {
+        $('#board-container').fadeIn(300);
+        $('#ayanokoji-profile').fadeIn(300);
         
-        if (bestMove) {
-            game.move(bestMove);
-            board.position(game.fen());
+        if (typeof game !== 'undefined' && typeof board !== 'undefined') {
+            game.reset();
+            board.orientation(color === 'w' ? 'white' : 'black');
+            board.start();
             
-            // تشغيل صوت الحركة لأيانوكوجي
-            if (typeof playMoveSound === 'function') playMoveSound();
-            
-            updateCheckStatus();
-        }
-        
-        $('#ayanokoji-thinking').removeClass('active');
-        $('.ayanokoji-profile').removeClass('thinking');
-    }, 100);
-}
-
-// ====== التحقق من حالة اللعبة ======
-function updateCheckStatus() {
-    removeMoveIndicators();
-    
-    if (game.in_checkmate()) {
-        var kingSquare = getKingSquare(game.turn());
-        if (kingSquare) $('.square-' + kingSquare).addClass('in-checkmate');
-        
-        var result = (game.turn() === playerColor) ? 'loss' : 'win';
-        
-        setTimeout(function() {
-            showEndScreen(result);
-        }, 500);
-        
-    } else if (game.in_check()) {
-        var kingSquare = getKingSquare(game.turn());
-        if (kingSquare) $('.square-' + kingSquare).addClass('in-check');
-        
-    } else if (game.in_draw()) {
-        setTimeout(function() {
-            showEndScreen('draw');
-        }, 500);
-    }
-}
-
-function getKingSquare(color) {
-    var boardPosition = game.board();
-    for (var i = 0; i < 8; i++) {
-        for (var j = 0; j < 8; j++) {
-            var piece = boardPosition[i][j];
-            if (piece && piece.type === 'k' && piece.color === color) {
-                return String.fromCharCode(97 + j) + (8 - i);
+            if (typeof removeMoveIndicators === 'function') {
+                removeMoveIndicators();
             }
         }
-    }
-    return null;
+        
+        if (playerColor === 'b') {
+            setTimeout(function() {
+                if (typeof game !== 'undefined' && !game.game_over()) {
+                    makeAyanokojiMove();
+                }
+            }, 1500);
+        }
+    });
 }
 
-$(window).resize(function() {
-    board.resize();
+function showEndScreen(result) {
+    const $endScreen = $('#end-screen');
+    const $endTitle = $('#end-title');
+    const $endQuote = $('#end-quote');
+    
+    $endScreen.removeClass('win draw loss');
+    
+    const quotes = {
+        win: {
+            title: 'لقد ترك أيانوكوجي تفوز هذه المرة',
+            quote: 'كل الناس محض أدوات، لا تهم الطريقة، لا يهم من يجب التضحية به، في هذا العالم الفوز هو كل شيء، طالما أفوز في النهاية'
+        },
+        draw: {
+            title: 'لقد تعادلت مع أيانوكوجي في هذا الدور',
+            quote: 'هل البشر متساوون؟ قال رجل عظيم ذات مرة: "السماء لا تضع شخصاً فوق آخر أو أسفل الآخر"'
+        },
+        loss: {
+            title: 'لقد خسرت',
+            quote: 'لا تيأس إذا رجعت خطوة للوراء، فلا تنس أن السهم يحتاج أن ترجعه للوراء لينطلق بقوة إلى الأمام'
+        }
+    };
+    
+    const data = quotes[result];
+    $endTitle.text(data.title);
+    $endQuote.text(data.quote);
+    $endScreen.addClass(result);
+    
+    $endScreen.fadeIn(400);
+}
+
+$('#end-screen').on('click', function() {
+    $(this).fadeOut(300, function() {
+        $('#start-screen').fadeIn(300);
+        $('#board-container').hide();
+        $('#ayanokoji-profile').hide();
+        gameStarted = false;
+        
+        if (typeof game !== 'undefined' && typeof board !== 'undefined') {
+            game.reset();
+            board.start();
+            if (typeof removeMoveIndicators === 'function') removeMoveIndicators();
+        }
+    });
 });
