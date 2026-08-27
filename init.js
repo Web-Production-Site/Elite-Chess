@@ -109,13 +109,23 @@ function removeMoveIndicators() {
 
 // ====== دور أيانوكوجي ======
 function makeAyanokojiMove() {
-    var bestMove = getBestMove(game, 4000); // 4 ثوانٍ كحد أقصى
+    // إظهار مؤشر التفكير (النقاط)
+    $('#ayanokoji-thinking').addClass('active');
+    $('.ayanokoji-profile').addClass('thinking');
     
-    if (bestMove) {
-        game.move(bestMove);
-        board.position(game.fen());
-        updateCheckStatus();
-    }
+    setTimeout(function() {
+        var bestMove = getBestMove(game, 4000); // 4 ثوانٍ كحد أقصى
+        
+        if (bestMove) {
+            game.move(bestMove);
+            board.position(game.fen());
+            updateCheckStatus();
+        }
+        
+        // إخفاء مؤشر التفكير
+        $('#ayanokoji-thinking').removeClass('active');
+        $('.ayanokoji-profile').removeClass('thinking');
+    }, 100);
 }
 
 function updateCheckStatus() {
