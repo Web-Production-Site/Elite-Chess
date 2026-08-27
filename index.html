@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/chessboard-1.0.0.css">
     <link rel="stylesheet" href="move-indicators.css">
+    <link rel="stylesheet" href="ayanokoji-profile.css">
 </head>
 <body>
 
@@ -18,9 +19,26 @@
 
     <div class="glass-overlay"></div>
 
-    <!-- رسالة تفكير أيانوكوجي -->
-    <div id="ayanokoji-status" style="position: fixed; top: 20px; right: 20px; color: rgba(255,255,255,0.8); font-family: 'Tajawal', sans-serif; font-size: 1.2rem; z-index: 100; text-shadow: 0 0 10px rgba(0,0,0,0.8); display: none;">
-        أيانوكوجي يفكر...
+    <!-- بروفايل أيانوكوجي -->
+    <div class="ayanokoji-profile">
+        <div class="profile-image-container">
+            <div class="profile-image">
+                <img src="ayanokoji.png" alt="Ayanokoji" 
+                     onerror="this.src='https://via.placeholder.com/120x120/1a1a1a/ffffff?text=Ayanokoji'">
+            </div>
+        </div>
+        
+        <div class="profile-info">
+            <h3 class="profile-name">Ayanokoji Kiyotaka</h3>
+            <p class="profile-elo">ELO: 2000+</p>
+            <p class="profile-quote">سيتساهل معك<br>وقد يتركك تفوز</p>
+        </div>
+        
+        <div class="thinking-indicator" id="ayanokoji-thinking">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
     </div>
 
     <div id="board-container"></div>
@@ -29,8 +47,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/chess.js"></script>
     <script src="js/chessboard-1.0.0.js"></script>
-    
-    <!-- استدعاء عقل أيانوكوجي -->
     <script src="ayanokoji-ai.js"></script>
     <script src="init.js"></script>
 </body>
