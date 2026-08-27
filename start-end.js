@@ -1,5 +1,5 @@
 // ==========================================
-// ملف إدارة شاشات البداية والنهاية
+// ملف إدارة شاشات البداية والنهاية (كامل)
 // ==========================================
 
 // المتغيرات العامة
@@ -58,14 +58,21 @@ function startGame(color) {
         $('#board-container').fadeIn(300);
         $('#ayanokoji-profile').fadeIn(300);
         
-        // إعادة ضبط اللعبة
-        if (typeof game !== 'undefined') {
+        // إعادة ضبط اللعبة وتوجيه الرقعة
+        if (typeof game !== 'undefined' && typeof board !== 'undefined') {
             game.reset();
+            
+            // ✅ توجيه الرقعة: إذا اختار 'w' تكون البيضاء في الأسفل، وإذا اختار 'b' تكون السوداء في الأسفل
+            board.orientation(color === 'w' ? 'white' : 'black');
+            
             board.start();
-            if (typeof removeMoveIndicators === 'function') removeMoveIndicators();
+            
+            if (typeof removeMoveIndicators === 'function') {
+                removeMoveIndicators();
+            }
         }
         
-        // إذا كان اللاعب يلعب بالأسود، أيانوكوجي يبدأ
+        // إذا كان اللاعب يلعب بالأسود، أيانوكوجي (الأبيض) يبدأ اللعب أولاً
         if (playerColor === 'b') {
             setTimeout(function() {
                 if (typeof game !== 'undefined' && !game.game_over()) {
@@ -115,7 +122,7 @@ $('#end-screen').on('click', function() {
         $('#ayanokoji-profile').hide();
         gameStarted = false;
         
-        if (typeof game !== 'undefined') {
+        if (typeof game !== 'undefined' && typeof board !== 'undefined') {
             game.reset();
             board.start();
             if (typeof removeMoveIndicators === 'function') removeMoveIndicators();
