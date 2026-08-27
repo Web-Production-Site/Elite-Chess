@@ -1,5 +1,5 @@
 // ==========================================
-// ملف إدارة شاشات البداية والنهاية (كامل)
+// ملف إدارة شاشات البداية والنهاية
 // ==========================================
 
 let playerColor = 'w';
@@ -27,8 +27,6 @@ changePawnColor();
 
 $('#start-screen').on('click', function() {
     if (!gameStarted) {
-        if (typeof startBgMusic === 'function') startBgMusic();
-        
         $(this).fadeOut(300, function() {
             $('#color-selection').fadeIn(300);
         });
@@ -47,12 +45,20 @@ function startGame(color) {
     playerColor = color;
     gameStarted = true;
     
+    // ✅ إعادة تعيين أول حركة للمباراة الجديدة
+    if (typeof resetFirstMove === 'function') resetFirstMove();
     if (typeof resetAyanokojiVoice === 'function') resetAyanokojiVoice();
     
     $('#color-selection').fadeOut(300, function() {
-        $('#board-container').fadeIn(300);
-        $('#ayanokoji-profile').fadeIn(300);
+        $('#board-container').css('display', 'block').hide().fadeIn(300);
+        $('#ayanokoji-profile').css('display', 'flex').hide().fadeIn(300);
         
+        setTimeout(function() {
+            if (typeof board !== 'undefined') {
+                board.resize();
+            }
+        }, 350);
+
         if (typeof game !== 'undefined' && typeof board !== 'undefined') {
             game.reset();
             board.orientation(color === 'w' ? 'white' : 'black');
@@ -68,7 +74,7 @@ function startGame(color) {
                 if (typeof game !== 'undefined' && !game.game_over()) {
                     makeAyanokojiMove();
                 }
-            }, 1000);
+            }, 1500);
         }
     });
 }
