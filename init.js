@@ -29,7 +29,7 @@ var board = Chessboard('board-container', {
         
         if (move === null) return 'snapback';
         
-        // ✅ تشغيل صوت الحركة
+        // تشغيل صوت الحركة الرقمي
         if (typeof playMoveSound === 'function') playMoveSound();
         
         removeMoveIndicators();
@@ -65,7 +65,6 @@ $(document).on('click', '.square-55d63', function(e) {
         });
         
         if (move !== null) {
-            // ✅ تشغيل صوت الحركة
             if (typeof playMoveSound === 'function') playMoveSound();
             
             board.position(game.fen());
@@ -133,7 +132,7 @@ function makeAyanokojiMove() {
             game.move(bestMove);
             board.position(game.fen());
             
-            // ✅ تشغيل صوت الحركة لأيانوكوجي
+            // تشغيل صوت الحركة لأيانوكوجي
             if (typeof playMoveSound === 'function') playMoveSound();
             
             updateCheckStatus();
