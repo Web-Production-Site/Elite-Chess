@@ -1,12 +1,12 @@
 // ==========================================
-// نظام إدارة الأصوات - صوت حركة خافت جداً
+// نظام إدارة الأصوات - صوت حركة خفيف جداً
 // ==========================================
 
 let audioContext = null;
 
 // عناصر الصوت
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
-if (ayanokojiVoice) ayanokojiVoice.volume = 1.0;
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.19; // 19%
 
 // ==========================================
 // تهيئة AudioContext
@@ -22,7 +22,7 @@ function initAudioContext() {
 }
 
 // ==========================================
-// صوت حركة القطعة - خافت جداً (5% من السابق)
+// صوت حركة القطعة - خفيف جداً
 // ==========================================
 function playMoveSound() {
     initAudioContext();
@@ -30,73 +30,27 @@ function playMoveSound() {
     
     const now = audioContext.currentTime;
     
-    // 1. النقرة الخشبية (خافتة جداً)
+    // 1. النقرة الخشبية (خفيفة جداً)
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(180, now);
-    oscillator.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+    oscillator.type = 'sine'; // تغيير إلى sine ليكون أنعم
+    oscillator.frequency.setValueAtTime(200, now);
+    oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.05);
     
-    // ✅ تخفيض إلى 0.0075 (كان 0.15)
-    gainNode.gain.setValueAtTime(0.0075, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    // ✅ تخفيض شديد
+    gainNode.gain.setValueAtTime(0.02, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
     
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
     oscillator.start(now);
-    oscillator.stop(now + 0.1);
-    
-    // 2. ضوضاء خفيفة (خافتة جداً)
-    const bufferSize = audioContext.sampleRate * 0.05;
-    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    
-    for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-    }
-    
-    const noise = audioContext.createBufferSource();
-    noise.buffer = noiseBuffer;
-    
-    const noiseGain = audioContext.createGain();
-    const noiseFilter = audioContext.createBiquadFilter();
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = 800;
-    
-    // ✅ تخفيض إلى 0.005 (كان 0.1)
-    noiseGain.gain.setValueAtTime(0.005, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-    
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(audioContext.destination);
-    
-    noise.start(now);
-    noise.stop(now + 0.05);
-    
-    // 3. رنين خفيف جداً (خافت جداً)
-    const ringOsc = audioContext.createOscillator();
-    const ringGain = audioContext.createGain();
-    
-    ringOsc.type = 'sine';
-    ringOsc.frequency.setValueAtTime(400, now + 0.02);
-    ringOsc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
-    
-    // ✅ تخفيض إلى 0.002 (كان 0.04)
-    ringGain.gain.setValueAtTime(0.002, now + 0.02);
-    ringGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    
-    ringOsc.connect(ringGain);
-    ringGain.connect(audioContext.destination);
-    
-    ringOsc.start(now + 0.02);
-    ringOsc.stop(now + 0.15);
+    oscillator.stop(now + 0.08);
 }
 
 // ==========================================
-// صوت أيانوكوجي (يحتاج ملف صوتي حقيقي)
+// صوت أيانوكوجي
 // ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
