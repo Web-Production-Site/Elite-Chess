@@ -1,3 +1,7 @@
+// ==========================================
+// ملف إدارة شاشات البداية والنهاية
+// ==========================================
+
 // المتغيرات العامة
 let playerColor = 'w';
 let gameStarted = false;
@@ -7,7 +11,7 @@ const pawnColors = [
     'rgba(200, 200, 200, 0.6)',   // رمادي
     'rgba(255, 255, 255, 0.4)',   // أبيض شفاف
     'rgba(0, 0, 0, 0.6)',         // أسود
-    'rgba(255, 255, 255, 0.8)'    // أبيض
+    'rgba(255, 255, 255, 0.8)'    // أبيض ساطع
 ];
 
 // SVG للبيدق
@@ -22,9 +26,9 @@ function changePawnColor() {
     $('#start-pawn').css('background-image', `url('${svg}')`);
 }
 
-// بدء تغيير الألوان
+// بدء تغيير الألوان فوراً
 setInterval(changePawnColor, 3000);
-changePawnColor(); // أول تغيير فوراً
+changePawnColor();
 
 // النقر على شاشة البداية
 $('#start-screen').on('click', function() {
@@ -55,12 +59,16 @@ function startGame(color) {
         $('#ayanokoji-profile').fadeIn(300);
         
         // إعادة ضبط اللعبة
-        resetGame();
+        if (typeof game !== 'undefined') {
+            game.reset();
+            board.start();
+            if (typeof removeMoveIndicators === 'function') removeMoveIndicators();
+        }
         
         // إذا كان اللاعب يلعب بالأسود، أيانوكوجي يبدأ
         if (playerColor === 'b') {
             setTimeout(function() {
-                if (!game.game_over()) {
+                if (typeof game !== 'undefined' && !game.game_over()) {
                     makeAyanokojiMove();
                 }
             }, 1000);
@@ -73,7 +81,6 @@ function showEndScreen(result) {
     const $endScreen = $('#end-screen');
     const $endTitle = $('#end-title');
     const $endQuote = $('#end-quote');
-    const $endPawn = $('#end-pawn');
     
     $endScreen.removeClass('win draw loss');
     
@@ -107,25 +114,11 @@ $('#end-screen').on('click', function() {
         $('#board-container').hide();
         $('#ayanokoji-profile').hide();
         gameStarted = false;
-        resetGame();
+        
+        if (typeof game !== 'undefined') {
+            game.reset();
+            board.start();
+            if (typeof removeMoveIndicators === 'function') removeMoveIndicators();
+        }
     });
 });
-
-// إعادة ضبط اللعبة
-function resetGame() {
-    if (typeof game !== 'undefined') {
-        game.reset();
-    }
-    if (typeof board !== 'undefined') {
-        board.start();
-    }
-    if (typeof removeMoveIndicators === 'function') {
-        removeMoveIndicators();
-    }
-    if (typeof updateTurnIndicator === 'function') {
-        updateTurnIndicator();
-    }
-}
-
-// تعديل دالة updateCheckStatus في init.js لاستدعاء showEndScreen
-// سيتم إضافته في init.js
