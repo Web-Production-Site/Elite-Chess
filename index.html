@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/chessboard-1.0.0.css">
     <link rel="stylesheet" href="move-indicators.css">
     <link rel="stylesheet" href="ayanokoji-profile.css">
+    <link rel="stylesheet" href="start-end-screens.css">
 </head>
 <body>
 
@@ -19,8 +20,25 @@
 
     <div class="glass-overlay"></div>
 
+    <!-- شاشة البداية -->
+    <div id="start-screen" class="start-screen">
+        <div class="start-pawn" id="start-pawn"></div>
+    </div>
+
+    <!-- شاشة اختيار اللون -->
+    <div id="color-selection" class="color-selection" style="display: none;">
+        <div class="color-option white-option" id="white-option">
+            <div class="option-pawn white-pawn"></div>
+            <span class="option-text">اللون الأبيض</span>
+        </div>
+        <div class="color-option black-option" id="black-option">
+            <div class="option-pawn black-pawn"></div>
+            <span class="option-text">اللون الأسود</span>
+        </div>
+    </div>
+
     <!-- بروفايل أيانوكوجي -->
-    <div class="ayanokoji-profile">
+    <div class="ayanokoji-profile" id="ayanokoji-profile" style="display: none;">
         <div class="profile-image-container">
             <div class="profile-image">
                 <img src="ayanokoji.png" alt="Ayanokoji" 
@@ -41,7 +59,16 @@
         </div>
     </div>
 
-    <div id="board-container"></div>
+    <div id="board-container" style="display: none;"></div>
+
+    <!-- شاشة النهاية -->
+    <div id="end-screen" class="end-screen" style="display: none;">
+        <div class="end-content">
+            <div class="end-pawn" id="end-pawn"></div>
+            <h2 class="end-title" id="end-title"></h2>
+            <p class="end-quote" id="end-quote"></p>
+        </div>
+    </div>
 
     <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -49,5 +76,6 @@
     <script src="js/chessboard-1.0.0.js"></script>
     <script src="ayanokoji-ai.js"></script>
     <script src="init.js"></script>
+    <script src="start-end.js"></script>
 </body>
 </html>
