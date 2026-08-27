@@ -1,5 +1,5 @@
 // ==========================================
-// ملف منطق اللعبة والذكاء الاصطناعي
+// ملف منطق اللعبة والذكاء الاصطناعي (كامل)
 // ==========================================
 
 var game = new Chess();
@@ -12,7 +12,7 @@ var board = Chessboard('board-container', {
     
     onDragStart: function(source, piece) {
         if (game.game_over()) return false;
-        // منع سحب قطع الخصم (حسب لون اللاعب)
+        // منع سحب قطع الخصم (حسب لون اللاعب المختار)
         if (playerColor === 'w' && piece.search(/^b/) !== -1) return false;
         if (playerColor === 'b' && piece.search(/^w/) !== -1) return false;
         
