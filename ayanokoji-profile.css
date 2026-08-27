@@ -1,0 +1,227 @@
+/* ========================================
+   بروفايل أيانوكوجي الأنيق
+   ======================================== */
+
+.ayanokoji-profile {
+    position: fixed;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, 
+        rgba(30, 30, 45, 0.7) 0%, 
+        rgba(15, 15, 25, 0.8) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    padding: 30px 25px;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    z-index: 50;
+    transition: all 0.3s ease;
+}
+
+.ayanokoji-profile:hover {
+    transform: translateY(-50%) translateX(5px);
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* حاوية الصورة */
+.profile-image-container {
+    width: 120px;
+    height: 120px;
+    position: relative;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 0 30px rgba(100, 100, 255, 0.3),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.profile-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%,
+        rgba(0, 0, 0, 0.2) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(30%) contrast(1.1);
+    transition: all 0.3s ease;
+}
+
+.profile-image:hover img {
+    filter: grayscale(0%) contrast(1.2);
+    transform: scale(1.05);
+}
+
+/* المعلومات */
+.profile-info {
+    text-align: center;
+    width: 100%;
+}
+
+.profile-name {
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
+}
+
+.profile-elo {
+    color: rgba(255, 215, 0, 0.9);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 15px 0;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.profile-quote {
+    color: rgba(200, 200, 220, 0.85);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 0;
+    font-style: italic;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+/* مؤشر التفكير - النقاط المتحركة */
+.thinking-indicator {
+    display: none;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.thinking-indicator.active {
+    display: flex;
+}
+
+.thinking-indicator .dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(180, 180, 200, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(180, 180, 200, 0.5);
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.thinking-indicator .dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.thinking-indicator .dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* تأثيرات إضافية */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba(100, 100, 255, 0.3),
+            inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    50% {
+        box-shadow: 
+            0 0 40px rgba(100, 100, 255, 0.5),
+            inset 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+}
+
+.ayanokoji-profile.thinking .profile-image {
+    animation: pulse-glow 2s infinite;
+}
+
+/* للتابلت والجوال */
+@media (max-width: 768px) {
+    .ayanokoji-profile {
+        left: 50%;
+        top: 20px;
+        transform: translateX(-50%);
+        width: 200px;
+        padding: 20px 15px;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .profile-image-container {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .profile-info {
+        text-align: right;
+        flex: 1;
+    }
+    
+    .profile-name {
+        font-size: 14px;
+        margin: 0 0 5px 0;
+    }
+    
+    .profile-elo {
+        font-size: 12px;
+        margin: 0 0 8px 0;
+    }
+    
+    .profile-quote {
+        font-size: 11px;
+        line-height: 1.6;
+        border-top: none;
+        padding-top: 0;
+    }
+    
+    .thinking-indicator {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0;
+    }
+}
