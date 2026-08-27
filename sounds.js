@@ -1,5 +1,5 @@
 // ==========================================
-// نظام إدارة الأصوات - بدون موسيقى خلفية
+// نظام إدارة الأصوات - صوت حركة خافت جداً
 // ==========================================
 
 let audioContext = null;
@@ -22,7 +22,7 @@ function initAudioContext() {
 }
 
 // ==========================================
-// صوت حركة القطعة - خفيف جداً
+// صوت حركة القطعة - خافت جداً (5% من السابق)
 // ==========================================
 function playMoveSound() {
     initAudioContext();
@@ -30,7 +30,7 @@ function playMoveSound() {
     
     const now = audioContext.currentTime;
     
-    // 1. النقرة الخشبية (مخففة)
+    // 1. النقرة الخشبية (خافتة جداً)
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -38,9 +38,9 @@ function playMoveSound() {
     oscillator.frequency.setValueAtTime(180, now);
     oscillator.frequency.exponentialRampToValueAtTime(80, now + 0.08);
     
-    // ✅ تخفيض الصوت إلى 0.15 (كان 0.4)
-    gainNode.gain.setValueAtTime(0.15, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+    // ✅ تخفيض إلى 0.0075 (كان 0.15)
+    gainNode.gain.setValueAtTime(0.0075, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
     
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
@@ -48,7 +48,7 @@ function playMoveSound() {
     oscillator.start(now);
     oscillator.stop(now + 0.1);
     
-    // 2. ضوضاء خفيفة (مخففة)
+    // 2. ضوضاء خفيفة (خافتة جداً)
     const bufferSize = audioContext.sampleRate * 0.05;
     const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
     const output = noiseBuffer.getChannelData(0);
@@ -65,9 +65,9 @@ function playMoveSound() {
     noiseFilter.type = 'lowpass';
     noiseFilter.frequency.value = 800;
     
-    // ✅ تخفيض الصوت إلى 0.1 (كان 0.25)
-    noiseGain.gain.setValueAtTime(0.1, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+    // ✅ تخفيض إلى 0.005 (كان 0.1)
+    noiseGain.gain.setValueAtTime(0.005, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
     
     noise.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
@@ -76,7 +76,7 @@ function playMoveSound() {
     noise.start(now);
     noise.stop(now + 0.05);
     
-    // 3. رنين خفيف جداً (مخفف)
+    // 3. رنين خفيف جداً (خافت جداً)
     const ringOsc = audioContext.createOscillator();
     const ringGain = audioContext.createGain();
     
@@ -84,9 +84,9 @@ function playMoveSound() {
     ringOsc.frequency.setValueAtTime(400, now + 0.02);
     ringOsc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
     
-    // ✅ تخفيض الصوت إلى 0.04 (كان 0.08)
-    ringGain.gain.setValueAtTime(0.04, now + 0.02);
-    ringGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    // ✅ تخفيض إلى 0.002 (كان 0.04)
+    ringGain.gain.setValueAtTime(0.002, now + 0.02);
+    ringGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
     
     ringOsc.connect(ringGain);
     ringGain.connect(audioContext.destination);
