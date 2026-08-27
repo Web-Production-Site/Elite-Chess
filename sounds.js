@@ -6,8 +6,8 @@ let audioContext = null;
 
 // عناصر الصوت
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
-// ✅ صوت أيانوكوجي 50%
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.5;
+// ✅ صوت أيانوكوجي 30%
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.3;
 
 // ==========================================
 // تهيئة AudioContext
@@ -23,7 +23,7 @@ function initAudioContext() {
 }
 
 // ==========================================
-// صوت حركة القطعة - 5% فقط
+// صوت حركة القطعة - 20% (مسموع لكن غير مزعج)
 // ==========================================
 function playMoveSound() {
     initAudioContext();
@@ -38,8 +38,8 @@ function playMoveSound() {
     oscillator.frequency.setValueAtTime(200, now);
     oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.05);
     
-    // ✅ 5% فقط
-    gainNode.gain.setValueAtTime(0.05, now);
+    // ✅ 20%
+    gainNode.gain.setValueAtTime(0.2, now);
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
     
     oscillator.connect(gainNode);
