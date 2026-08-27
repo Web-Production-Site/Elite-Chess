@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✧ Elite Chess ✧</title>
+    <title> Elite Chess ✧</title>
     <link rel="icon" href="favicon.png" type="image/png">
     
     <link rel="stylesheet" href="style.css">
@@ -19,6 +19,19 @@
     </video>
 
     <div class="glass-overlay"></div>
+
+    <!-- عناصر الصوت -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="bg-music.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="move-sound" preload="auto">
+        <source src="move.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="ayanokoji-voice" preload="auto">
+        <source src="ayanokoji-voice.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- شاشة البداية -->
     <div id="start-screen" class="start-screen">
@@ -75,6 +88,7 @@
     <script src="js/chess.js"></script>
     <script src="js/chessboard-1.0.0.js"></script>
     <script src="ayanokoji-ai.js"></script>
+    <script src="sounds.js"></script>
     <script src="init.js"></script>
     <script src="start-end.js"></script>
 </body>
