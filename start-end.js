@@ -27,7 +27,6 @@ changePawnColor();
 
 $('#start-screen').on('click', function() {
     if (!gameStarted) {
-        // ✅ تشغيل موسيقى الخلفية عند أول نقرة
         if (typeof startBgMusic === 'function') startBgMusic();
         
         $(this).fadeOut(300, function() {
@@ -48,7 +47,6 @@ function startGame(color) {
     playerColor = color;
     gameStarted = true;
     
-    // ✅ إعادة ضبط صوت أيانوكوجي للمباراة الجديدة
     if (typeof resetAyanokojiVoice === 'function') resetAyanokojiVoice();
     
     $('#color-selection').fadeOut(300, function() {
