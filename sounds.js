@@ -1,12 +1,13 @@
 // ==========================================
-// نظام إدارة الأصوات - صوت حركة خفيف جداً
+// نظام إدارة الأصوات
 // ==========================================
 
 let audioContext = null;
 
 // عناصر الصوت
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.19; // 19%
+// ✅ صوت أيانوكوجي 50%
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.5;
 
 // ==========================================
 // تهيئة AudioContext
@@ -22,7 +23,7 @@ function initAudioContext() {
 }
 
 // ==========================================
-// صوت حركة القطعة - خفيف جداً
+// صوت حركة القطعة - 5% فقط
 // ==========================================
 function playMoveSound() {
     initAudioContext();
@@ -30,16 +31,15 @@ function playMoveSound() {
     
     const now = audioContext.currentTime;
     
-    // 1. النقرة الخشبية (خفيفة جداً)
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
-    oscillator.type = 'sine'; // تغيير إلى sine ليكون أنعم
+    oscillator.type = 'sine';
     oscillator.frequency.setValueAtTime(200, now);
     oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.05);
     
-    // ✅ تخفيض شديد
-    gainNode.gain.setValueAtTime(0.02, now);
+    // ✅ 5% فقط
+    gainNode.gain.setValueAtTime(0.05, now);
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
     
     oscillator.connect(gainNode);
