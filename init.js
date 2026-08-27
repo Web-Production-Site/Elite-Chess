@@ -1,3 +1,7 @@
+// ==========================================
+// ملف منطق اللعبة والذكاء الاصطناعي
+// ==========================================
+
 var game = new Chess();
 var selectedSquare = null;
 
@@ -8,7 +12,10 @@ var board = Chessboard('board-container', {
     
     onDragStart: function(source, piece) {
         if (game.game_over()) return false;
-        if (piece.search(/^b/) !== -1) return false;
+        // منع سحب قطع الخصم (حسب لون اللاعب)
+        if (playerColor === 'w' && piece.search(/^b/) !== -1) return false;
+        if (playerColor === 'b' && piece.search(/^w/) !== -1) return false;
+        
         removeMoveIndicators();
         selectedSquare = null;
         return true;
@@ -28,6 +35,8 @@ var board = Chessboard('board-container', {
         
         if (!game.game_over()) {
             setTimeout(makeAyanokojiMove, 300);
+        } else {
+            updateCheckStatus(); // للتأكد من عرض شاشة النهاية فوراً
         }
     },
     
@@ -38,7 +47,6 @@ var board = Chessboard('board-container', {
 
 // ====== النقر على المربعات: اختيار قطعة + تحريك بالنقر على نقاط الحركة ======
 $(document).on('click', '.square-55d63', function(e) {
-    // تجاهل النقر أثناء السحب
     if (board.dragging && board.dragging()) return;
     
     var square = $(this).data('square');
@@ -46,7 +54,7 @@ $(document).on('click', '.square-55d63', function(e) {
     
     var piece = game.get(square);
     
-    // 1. إذا نقرنا على نقطة حركة (مؤشر موجود) → حرّك القطعة المحددة
+    // 1. إذا نقرنا على نقطة حركة → حرّك القطعة المحددة
     if (selectedSquare && $(this).is('.move-normal, .move-capture, .move-castle')) {
         var move = game.move({
             from: selectedSquare,
@@ -61,15 +69,16 @@ $(document).on('click', '.square-55d63', function(e) {
             
             if (!game.game_over()) {
                 setTimeout(makeAyanokojiMove, 300);
+            } else {
+                updateCheckStatus();
             }
             return;
         }
     }
     
-    // 2. إذا نقرنا على قطعة بيضاء → حددها واعرض حركاتها
-    if (piece && piece.color === 'w') {
+    // 2. إذا نقرنا على قطعة تابعة للاعب → حددها واعرض حركاتها
+    if (piece && piece.color === playerColor) {
         if (selectedSquare === square) {
-            // إلغاء التحديد عند النقر على نفس القطعة
             selectedSquare = null;
             removeMoveIndicators();
         } else {
@@ -109,7 +118,6 @@ function removeMoveIndicators() {
 
 // ====== دور أيانوكوجي ======
 function makeAyanokojiMove() {
-    // إظهار مؤشر التفكير (النقاط)
     $('#ayanokoji-thinking').addClass('active');
     $('.ayanokoji-profile').addClass('thinking');
     
@@ -122,20 +130,35 @@ function makeAyanokojiMove() {
             updateCheckStatus();
         }
         
-        // إخفاء مؤشر التفكير
         $('#ayanokoji-thinking').removeClass('active');
         $('.ayanokoji-profile').removeClass('thinking');
     }, 100);
 }
 
+// ====== التحقق من حالة اللعبة وعرض النهاية ======
 function updateCheckStatus() {
     removeMoveIndicators();
+    
     if (game.in_checkmate()) {
         var kingSquare = getKingSquare(game.turn());
         if (kingSquare) $('.square-' + kingSquare).addClass('in-checkmate');
+        
+        // تحديد النتيجة بناءً على لون اللاعب
+        // إذا كان دورك الحالي وأنت في كش مات، فأنت الخاسر
+        var result = (game.turn() === playerColor) ? 'loss' : 'win';
+        
+        setTimeout(function() {
+            showEndScreen(result);
+        }, 500);
+        
     } else if (game.in_check()) {
         var kingSquare = getKingSquare(game.turn());
         if (kingSquare) $('.square-' + kingSquare).addClass('in-check');
+        
+    } else if (game.in_draw()) {
+        setTimeout(function() {
+            showEndScreen('draw');
+        }, 500);
     }
 }
 
