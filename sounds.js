@@ -1,18 +1,18 @@
 // ==========================================
-// نظام إدارة الأصوات - مع صوت رقمي مصنوع
+// نظام إدارة الأصوات - مع موسيقى خلفية رقمية
 // ==========================================
 
 // المتغيرات
 let bgMusicStarted = false;
 let ayanokojiVoicePlayed = false;
 let audioContext = null;
+let bgMusicOscillators = [];
+let bgMusicGain = null;
 
-// عناصر الصوت (موسيقى الخلفية وصوت أيانوكوجي فقط - يحتاجان ملفات)
-const bgMusic = document.getElementById('bg-music');
+// عناصر الصوت (صوت أيانوكوجي فقط - يحتاج ملف)
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 
 // ضبط مستوى الصوت
-if (bgMusic) bgMusic.volume = 0.15; // 15% - صوت منخفض للخلفية
 if (ayanokojiVoice) ayanokojiVoice.volume = 1.0; // 100% - صوت واضح لأيانوكوجي
 
 // ==========================================
@@ -34,16 +34,16 @@ function playMoveSound() {
     
     const now = audioContext.currentTime;
     
-    // 1. النقرة الأساسية (خشبية) - تردد منخفض قصير
+    // 1. النقرة الأساسية (خشبية)
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
-    oscillator.type = 'square'; // موجة مربعة تعطي صوتاً خشناً
-    oscillator.frequency.setValueAtTime(180, now); // تردد منخفض (خشبي)
-    oscillator.frequency.exponentialRampToValueAtTime(80, now + 0.08); // ينخفض بسرعة
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(180, now);
+    oscillator.frequency.exponentialRampToValueAtTime(80, now + 0.08);
     
     gainNode.gain.setValueAtTime(0.4, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1); // يضمحل بسرعة
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
     
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
@@ -51,8 +51,8 @@ function playMoveSound() {
     oscillator.start(now);
     oscillator.stop(now + 0.1);
     
-    // 2. ضوضاء بيضاء خفيفة (إحساس بالخشونة والاحتكاك)
-    const bufferSize = audioContext.sampleRate * 0.05; // 50 ميلي ثانية
+    // 2. ضوضاء بيضاء خفيفة
+    const bufferSize = audioContext.sampleRate * 0.05;
     const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     
@@ -66,7 +66,7 @@ function playMoveSound() {
     const noiseGain = audioContext.createGain();
     const noiseFilter = audioContext.createBiquadFilter();
     noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = 800; // فلتر منخفض لإعطاء دفء للصوت
+    noiseFilter.frequency.value = 800;
     
     noiseGain.gain.setValueAtTime(0.25, now);
     noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
@@ -78,7 +78,7 @@ function playMoveSound() {
     noise.start(now);
     noise.stop(now + 0.05);
     
-    // 3. رنين خفيف جداً (صدى الرقعة)
+    // 3. رنين خفيف
     const ringOsc = audioContext.createOscillator();
     const ringGain = audioContext.createGain();
     
@@ -97,23 +97,94 @@ function playMoveSound() {
 }
 
 // ==========================================
-// موسيقى الخلفية
+// موسيقى خلفية رقمية هادئة للتركيز
 // ==========================================
 function startBgMusic() {
-    if (!bgMusicStarted && bgMusic) {
-        bgMusic.play().then(() => {
-            bgMusicStarted = true;
-        }).catch(err => {
-            console.log('تعذر تشغيل الموسيقى تلقائياً:', err);
-        });
-    }
+    if (bgMusicStarted) return;
+    
+    initAudioContext();
+    if (!audioContext) return;
+    
+    // إنشاء gain رئيسي للموسيقى (مستوى منخفض جداً)
+    bgMusicGain = audioContext.createGain();
+    bgMusicGain.gain.value = 0.06; // 6% فقط - هادئ جداً
+    bgMusicGain.connect(audioContext.destination);
+    
+    // إنشاء فلتر تمرير منخفض لجعل الصوت دافئاً
+    const masterFilter = audioContext.createBiquadFilter();
+    masterFilter.type = 'lowpass';
+    masterFilter.frequency.value = 500; // تردد منخفض فقط
+    masterFilter.Q.value = 1;
+    masterFilter.connect(bgMusicGain);
+    
+    // النغمة الأولى: C2 (65.41 Hz) - عميقة جداً
+    const osc1 = audioContext.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.value = 65.41;
+    
+    const gain1 = audioContext.createGain();
+    gain1.gain.value = 0.5;
+    
+    osc1.connect(gain1);
+    gain1.connect(masterFilter);
+    osc1.start();
+    bgMusicOscillators.push(osc1);
+    
+    // النغمة الثانية: G2 (98.00 Hz) - خامسة
+    const osc2 = audioContext.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.value = 98.00;
+    
+    const gain2 = audioContext.createGain();
+    gain2.gain.value = 0.3;
+    
+    osc2.connect(gain2);
+    gain2.connect(masterFilter);
+    osc2.start();
+    bgMusicOscillators.push(osc2);
+    
+    // النغمة الثالثة: C3 (130.81 Hz) - أوكتاف أعلى
+    const osc3 = audioContext.createOscillator();
+    osc3.type = 'sine';
+    osc3.frequency.value = 130.81;
+    
+    const gain3 = audioContext.createGain();
+    gain3.gain.value = 0.15;
+    
+    osc3.connect(gain3);
+    gain3.connect(masterFilter);
+    osc3.start();
+    bgMusicOscillators.push(osc3);
+    
+    // تغيير بطيء جداً في التردد (drone effect)
+    const now = audioContext.currentTime;
+    osc1.frequency.setValueAtTime(65.41, now);
+    osc1.frequency.linearRampToValueAtTime(65.41, now + 30); // ثابت
+    
+    osc2.frequency.setValueAtTime(98.00, now);
+    osc2.frequency.linearRampToValueAtTime(98.00, now + 30); // ثابت
+    
+    // النغمة الثالثة تتغير ببطء شديد
+    osc3.frequency.setValueAtTime(130.81, now);
+    osc3.frequency.linearRampToValueAtTime(146.83, now + 15); // D3
+    osc3.frequency.linearRampToValueAtTime(130.81, now + 30); // العودة لـ C3
+    
+    bgMusicStarted = true;
+    console.log('تم تشغيل الموسيقى الخلفية');
 }
 
 function stopBgMusic() {
-    if (bgMusic) {
-        bgMusic.pause();
-        bgMusic.currentTime = 0;
-        bgMusicStarted = false;
+    if (bgMusicGain) {
+        // fade out
+        bgMusicGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+        
+        setTimeout(() => {
+            bgMusicOscillators.forEach(osc => {
+                try { osc.stop(); } catch(e) {}
+            });
+            bgMusicOscillators = [];
+            bgMusicStarted = false;
+        }, 1000);
     }
 }
 
@@ -139,9 +210,9 @@ function resetAyanokojiVoice() {
     }
 }
 
-// تشغيل موسيقى الخلفية عند أول تفاعل
+// تشغيل الموسيقى عند أول تفاعل
 document.addEventListener('click', function() {
-    initAudioContext(); // تهيئة الصوت الرقمي
+    initAudioContext();
     startBgMusic();
 }, { once: true });
 
