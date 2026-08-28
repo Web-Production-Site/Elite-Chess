@@ -14,18 +14,14 @@
 </head>
 <body>
 
-    <video id="bg-video" autoplay muted loop playsinline>
-        <source id="video-source" src="" type="video/mp4">
-    </video>
-
     <div class="glass-overlay"></div>
 
-    <!-- ✅ فيديو الخلفية كصوت (مخفي) -->
-    <video id="bg-audio-video" loop preload="auto" style="display: none;">
-        <source src="bg-music.mp4" type="video/mp4">
-    </video>
+    <!-- ✅ موسيقى الخلفية (ضع ملفك هنا وسمّه bg-music.mp3) -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="bg-music.mp3" type="audio/mpeg">
+    </audio>
 
-    <!-- صوت أيانوكوجي -->
+    <!-- ✅ صوت أيانوكوجي (ضع ملفك هنا وسمّه ayanokoji-voice.mp3) -->
     <audio id="ayanokoji-voice" preload="auto">
         <source src="ayanokoji-voice.mp3" type="audio/mpeg">
     </audio>
@@ -56,7 +52,7 @@
             </div>
         </div>
         
-        <!-- ✅ مؤشر الصوت المتحرك (يظهر عند تشغيل الصوت) -->
+        <!-- مؤشر الصوت المتحرك (يظهر عند تكلم أيانوكوجي) -->
         <div class="voice-indicator" id="voice-indicator">
             <span class="voice-bar"></span>
             <span class="voice-bar"></span>
@@ -89,7 +85,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/chess.js"></script>
     <script src="js/chessboard-1.0.0.js"></script>
