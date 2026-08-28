@@ -1,16 +1,23 @@
 // ==========================================
-// نظام إدارة الأصوات (مضمون العمل)
+// نظام إدارة الأصوات (نسخة التشخيص والإصلاح)
 // ==========================================
-
-let audioContext = null;
-let bgMusicStarted = false;
 
 const bgMusic = document.getElementById('bg-music');
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
+let audioContext = null;
 
-// ✅ ضبط مستويات الصوت
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.20; // 20% لصوت أيانوكوجي
+// 1. فحص وجود الملف وإعداد الصوت
+if (bgMusic) {
+    bgMusic.volume = 0.28; // 28%
+    console.log("✅ تم العثور على عنصر الموسيقى في HTML.");
+} else {
+    console.error("❌ خطأ فادح: لم يتم العثور على <audio id='bg-music'> في index.html");
+}
+
+if (ayanokojiVoice) {
+    ayanokojiVoice.volume = 0.20; // 20%
+}
 
 function initAudioContext() {
     if (!audioContext) {
@@ -20,70 +27,65 @@ function initAudioContext() {
     }
 }
 
-// ==========================================
-// تشغيل موسيقى الخلفية عند أول نقرة
-// ==========================================
-function startBgMusic() {
-    if (bgMusicStarted || !bgMusic) return;
+// 2. دالة التشغيل القسلية مع تقرير الأخطاء
+function forcePlayMusic() {
+    if (!bgMusic) return;
     
-    // ضبط الصوت على 28%
-    bgMusic.volume = 0.28; 
+    console.log("🔄 جاري محاولة تشغيل الموسيقى...");
     
     bgMusic.play().then(() => {
-        bgMusicStarted = true;
-        console.log('✅ تم تشغيل موسيقى الخلفية بنجاح');
-    }).catch(err => {
-        console.log('⚠️ المتصفح يمنع التشغيل التلقائي، في انتظار النقر:', err);
+        console.log("🎉 نجاح! موسيقى الخلفية تعمل الآن.");
+    }).catch(error => {
+        console.error("⛔ فشل تشغيل الموسيقى. التفاصيل:", error);
+        console.error("💡 الحل: تأكد أن اسم الملف في GitHub هو 'bg-music.mp3' بحروف صغيرة تماماً (لا يوجد B كبيرة).");
     });
 }
 
-function stopBgMusic() {
-    if (bgMusic) {
-        bgMusic.pause();
-        bgMusic.currentTime = 0;
-        bgMusicStarted = false;
-    }
-}
+// 3. ربط التشغيل بكل أنواع النقر الممكنة لضمان العمل
+document.addEventListener('click', function() {
+    initAudioContext();
+    forcePlayMusic();
+}, { once: true });
+
+document.addEventListener('touchstart', function() {
+    initAudioContext();
+    forcePlayMusic();
+}, { once: true });
+
+// محاولة إضافية عند تحميل الصفحة (قد تنجح في بعض المتصفحات)
+window.addEventListener('load', () => {
+    setTimeout(forcePlayMusic, 1500);
+});
 
 // ==========================================
-// صوت حركة القطعة (20%)
+// باقي وظائف الصوت (حركة القطع وأياناتكوجي)
 // ==========================================
+
 function playMoveSound() {
     initAudioContext();
     if (!audioContext) return;
-    
     const now = audioContext.currentTime;
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(200, now);
-    oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.05);
-    
-    gainNode.gain.setValueAtTime(0.2, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.start(now);
-    oscillator.stop(now + 0.08);
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start(now);
+    osc.stop(now + 0.08);
 }
 
-// ==========================================
-// صوت أيانوكوجي مع المؤشر البصري
-// ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
         ayanokojiVoice.currentTime = 0;
-        
         if (voiceIndicator) voiceIndicator.classList.add('active');
-        
-        ayanokojiVoice.play().catch(err => {
+        ayanokojiVoice.play().catch(() => {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         });
-        
-        ayanokojiVoice.onended = function() {
+        ayanokojiVoice.onended = () => {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         };
     }
@@ -97,20 +99,6 @@ function resetAyanokojiVoice() {
     if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
-// ✅ الاستماع لأول نقرة أو لمس في أي مكان في الصفحة لتشغيل الموسيقى
-document.addEventListener('click', function() {
-    initAudioContext();
-    startBgMusic();
-}, { once: true });
-
-document.addEventListener('touchstart', function() {
-    initAudioContext();
-    startBgMusic();
-}, { once: true });
-
-// تصدير الدوال
-window.startBgMusic = startBgMusic;
-window.stopBgMusic = stopBgMusic;
 window.playMoveSound = playMoveSound;
 window.playAyanokojiVoice = playAyanokojiVoice;
 window.resetAyanokojiVoice = resetAyanokojiVoice;
