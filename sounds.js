@@ -1,3 +1,7 @@
+// ==========================================
+// نظام إدارة الأصوات (مضمون العمل)
+// ==========================================
+
 let audioContext = null;
 let bgMusicStarted = false;
 
@@ -6,7 +10,6 @@ const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 
 // ✅ ضبط مستويات الصوت
-if (bgMusic) bgMusic.volume = 0.28;           // 28% لموسيقى الخلفية
 if (ayanokojiVoice) ayanokojiVoice.volume = 0.20; // 20% لصوت أيانوكوجي
 
 function initAudioContext() {
@@ -18,16 +21,19 @@ function initAudioContext() {
 }
 
 // ==========================================
-// تشغيل موسيقى الخلفية (ملف MP3 خارجي)
+// تشغيل موسيقى الخلفية عند أول نقرة
 // ==========================================
 function startBgMusic() {
     if (bgMusicStarted || !bgMusic) return;
     
+    // ضبط الصوت على 28%
+    bgMusic.volume = 0.28; 
+    
     bgMusic.play().then(() => {
         bgMusicStarted = true;
-        console.log('تم تشغيل موسيقى الخلفية');
+        console.log('✅ تم تشغيل موسيقى الخلفية بنجاح');
     }).catch(err => {
-        console.log('انتظار تفاعل المستخدم:', err);
+        console.log('⚠️ المتصفح يمنع التشغيل التلقائي، في انتظار النقر:', err);
     });
 }
 
@@ -91,7 +97,7 @@ function resetAyanokojiVoice() {
     if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
-// تشغيل الموسيقى عند أول تفاعل
+// ✅ الاستماع لأول نقرة أو لمس في أي مكان في الصفحة لتشغيل الموسيقى
 document.addEventListener('click', function() {
     initAudioContext();
     startBgMusic();
@@ -102,6 +108,7 @@ document.addEventListener('touchstart', function() {
     startBgMusic();
 }, { once: true });
 
+// تصدير الدوال
 window.startBgMusic = startBgMusic;
 window.stopBgMusic = stopBgMusic;
 window.playMoveSound = playMoveSound;
