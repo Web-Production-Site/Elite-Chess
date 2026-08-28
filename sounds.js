@@ -7,7 +7,7 @@ const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 
 // ✅ ضبط مستويات الصوت
-if (bgMusic) bgMusic.volume = 0.5;           // 20% لموسيقى الخلفية (MP3)
+if (bgMusic) bgMusic.volume = 0.05;           // 20% لموسيقى الخلفية (MP3)
 if (ayanokojiVoice) ayanokojiVoice.volume = 0.35; // 35% لصوت أيانوكوجي
 
 // ==========================================
