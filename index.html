@@ -6,6 +6,7 @@
     <title>Elite Chess ✧</title>
     <link rel="icon" href="favicon.png" type="image/png">
     
+    <!-- ملفات التنسيق -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/chessboard-1.0.0.css">
     <link rel="stylesheet" href="move-indicators.css">
@@ -21,7 +22,7 @@
 
     <div class="glass-overlay"></div>
 
-    <!-- ✅ موسيقى الخلفية الأسطورية (أضفت هذا السطر) -->
+    <!-- ✅ موسيقى الخلفية (بدون autoplay لتجنب حظر المتصفح، سيتم تشغيلها بالكود) -->
     <audio id="bg-music" loop preload="auto">
         <source src="bg-music.mp3" type="audio/mpeg">
     </audio>
@@ -57,7 +58,7 @@
             </div>
         </div>
         
-        <!-- مؤشر الصوت المتحرك -->
+        <!-- مؤشر الصوت المتحرك (الخطوط العمودية) -->
         <div class="voice-indicator" id="voice-indicator">
             <span class="voice-bar"></span>
             <span class="voice-bar"></span>
@@ -72,6 +73,7 @@
             <p class="profile-quote">سيتساهل معك<br>وقد يتركك تفوز</p>
         </div>
         
+        <!-- مؤشر التفكير (النقاط) -->
         <div class="thinking-indicator" id="ayanokoji-thinking">
             <span class="dot"></span>
             <span class="dot"></span>
@@ -79,6 +81,7 @@
         </div>
     </div>
 
+    <!-- حاوية رقعة الشطرنج -->
     <div id="board-container" style="display: none;"></div>
 
     <!-- شاشة النهاية -->
@@ -90,6 +93,7 @@
         </div>
     </div>
 
+    <!-- ملفات الجافاسكريبت (بالترتيب الصحيح) -->
     <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/chess.js"></script>
