@@ -82,6 +82,49 @@
     transform: scale(1.05);
 }
 
+/* ========================================
+   ✅ مؤشر الصوت المتحرك (Voice Indicator)
+   ======================================== */
+.voice-indicator {
+    display: none; /* مخفي افتراضياً */
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    width: 100%;
+    margin-top: -10px;
+}
+
+.voice-indicator.active {
+    display: flex; /* يظهر عند تشغيل الصوت */
+}
+
+.voice-bar {
+    width: 4px;
+    height: 10px;
+    background: linear-gradient(to top, rgba(100, 150, 255, 0.6), rgba(255, 255, 255, 0.9));
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(100, 150, 255, 0.5);
+    animation: voiceWave 0.8s ease-in-out infinite;
+}
+
+.voice-bar:nth-child(1) { animation-delay: 0s; }
+.voice-bar:nth-child(2) { animation-delay: 0.1s; }
+.voice-bar:nth-child(3) { animation-delay: 0.2s; }
+.voice-bar:nth-child(4) { animation-delay: 0.3s; }
+.voice-bar:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes voiceWave {
+    0%, 100% {
+        height: 10px;
+        opacity: 0.5;
+    }
+    50% {
+        height: 25px;
+        opacity: 1;
+    }
+}
+
 /* المعلومات */
 .profile-info {
     text-align: center;
@@ -192,6 +235,20 @@
     .profile-image-container {
         width: 60px;
         height: 60px;
+    }
+    
+    .voice-indicator {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0;
+        height: 20px;
+    }
+    
+    .voice-bar {
+        width: 3px;
+        height: 8px;
     }
     
     .profile-info {
