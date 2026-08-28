@@ -1,21 +1,21 @@
 // ==========================================
-// نظام إدارة الأصوات - مع فيديو خلفية ومؤشر صوتي
+// نظام إدارة الأصوات
 // ==========================================
 
 let audioContext = null;
-let bgVideoStarted = false;
+let bgMusicStarted = false;
 
 // عناصر الصوت
+const bgMusic = document.getElementById('bg-music');
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
-const bgAudioVideo = document.getElementById('bg-audio-video');
 const voiceIndicator = document.getElementById('voice-indicator');
 
 // ✅ ضبط مستويات الصوت
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.18; // 18%
-if (bgAudioVideo) bgAudioVideo.volume = 0.2; // 20%
+if (bgMusic) bgMusic.volume = 0.45;       // 45% لموسيقى الخلفية
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.20; // 20% لصوت أيانوكوجي
 
 // ==========================================
-// تهيئة AudioContext
+// تهيئة AudioContext (لصوت الحركة)
 // ==========================================
 function initAudioContext() {
     if (!audioContext) {
@@ -28,23 +28,24 @@ function initAudioContext() {
 }
 
 // ==========================================
-// تشغيل فيديو الخلفية كصوت
+// تشغيل موسيقى الخلفية
 // ==========================================
 function startBgMusic() {
-    if (bgVideoStarted || !bgAudioVideo) return;
+    if (bgMusicStarted || !bgMusic) return;
     
-    bgAudioVideo.play().then(() => {
-        bgVideoStarted = true;
-        console.log('تم تشغيل صوت الخلفية من الفيديو');
+    bgMusic.play().then(() => {
+        bgMusicStarted = true;
+        console.log('تم تشغيل موسيقى الخلفية');
     }).catch(err => {
-        console.log('تعذر تشغيل فيديو الخلفية:', err);
+        console.log('انتظار تفاعل المستخدم لتشغيل الموسيقى:', err);
     });
 }
 
 function stopBgMusic() {
-    if (bgAudioVideo) {
-        bgAudioVideo.pause();
-        bgVideoStarted = false;
+    if (bgMusic) {
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+        bgMusicStarted = false;
     }
 }
 
@@ -75,24 +76,23 @@ function playMoveSound() {
 }
 
 // ==========================================
-// ✅ صوت أيانوكوجي مع مؤشر بصري
+// صوت أيانوكوجي مع المؤشر البصري
 // ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
         ayanokojiVoice.currentTime = 0;
         
-        // ✅ إظهار مؤشر الصوت المتحرك
+        // ✅ إظهار الخطوط المتحركة تحت الصورة
         if (voiceIndicator) voiceIndicator.classList.add('active');
         
         ayanokojiVoice.play().then(() => {
             console.log('بدأ صوت أيانوكوجي');
         }).catch(err => {
             console.log('تعذر تشغيل صوت أيانوكوجي:', err);
-            // إخفاء المؤشر إذا فشل التشغيل
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         });
         
-        // ✅ إخفاء المؤشر عند انتهاء الصوت
+        // ✅ إخفاء الخطوط عند انتهاء الصوت
         ayanokojiVoice.onended = function() {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
             console.log('انتهى صوت أيانوكوجي');
@@ -105,7 +105,6 @@ function resetAyanokojiVoice() {
         ayanokojiVoice.pause();
         ayanokojiVoice.currentTime = 0;
     }
-    // ✅ إخفاء المؤشر عند إعادة التعيين
     if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
