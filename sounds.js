@@ -1,10 +1,13 @@
 let audioContext = null;
+let bgMusicStarted = false;
 
+const bgMusic = document.getElementById('bg-music');
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 
-// ✅ صوت أيانوكوجي 20%
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.20;
+// ✅ ضبط مستويات الصوت
+if (bgMusic) bgMusic.volume = 0.28;           // 28% لموسيقى الخلفية
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.20; // 20% لصوت أيانوكوجي
 
 function initAudioContext() {
     if (!audioContext) {
@@ -14,7 +17,31 @@ function initAudioContext() {
     }
 }
 
-// ✅ صوت حركة القطعة (20%)
+// ==========================================
+// تشغيل موسيقى الخلفية (ملف MP3 خارجي)
+// ==========================================
+function startBgMusic() {
+    if (bgMusicStarted || !bgMusic) return;
+    
+    bgMusic.play().then(() => {
+        bgMusicStarted = true;
+        console.log('تم تشغيل موسيقى الخلفية');
+    }).catch(err => {
+        console.log('انتظار تفاعل المستخدم:', err);
+    });
+}
+
+function stopBgMusic() {
+    if (bgMusic) {
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+        bgMusicStarted = false;
+    }
+}
+
+// ==========================================
+// صوت حركة القطعة (20%)
+// ==========================================
 function playMoveSound() {
     initAudioContext();
     if (!audioContext) return;
@@ -37,19 +64,19 @@ function playMoveSound() {
     oscillator.stop(now + 0.08);
 }
 
-// ✅ صوت أيانوكوجي مع المؤشر البصري
+// ==========================================
+// صوت أيانوكوجي مع المؤشر البصري
+// ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
         ayanokojiVoice.currentTime = 0;
         
-        // إظهار الخطوط المتحركة
         if (voiceIndicator) voiceIndicator.classList.add('active');
         
         ayanokojiVoice.play().catch(err => {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         });
         
-        // إخفاء الخطوط عند الانتهاء
         ayanokojiVoice.onended = function() {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         };
@@ -64,9 +91,19 @@ function resetAyanokojiVoice() {
     if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
-document.addEventListener('click', function() { initAudioContext(); }, { once: true });
-document.addEventListener('touchstart', function() { initAudioContext(); }, { once: true });
+// تشغيل الموسيقى عند أول تفاعل
+document.addEventListener('click', function() {
+    initAudioContext();
+    startBgMusic();
+}, { once: true });
 
+document.addEventListener('touchstart', function() {
+    initAudioContext();
+    startBgMusic();
+}, { once: true });
+
+window.startBgMusic = startBgMusic;
+window.stopBgMusic = stopBgMusic;
 window.playMoveSound = playMoveSound;
 window.playAyanokojiVoice = playAyanokojiVoice;
 window.resetAyanokojiVoice = resetAyanokojiVoice;
