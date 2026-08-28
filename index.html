@@ -14,9 +14,14 @@
 </head>
 <body>
 
+    <!-- ✅ الخلفية المتحركة (تظهر دائماً) -->
+    <video id="bg-video" autoplay muted loop playsinline preload="auto">
+        <source id="video-source" src="" type="video/mp4">
+    </video>
+
     <div class="glass-overlay"></div>
 
-    <!-- ✅ صوت أيانوكوجي فقط (الملف الخارجي الذي لديك) -->
+    <!-- ✅ صوت أيانوكوجي فقط (بدون موسيقى خلفية) -->
     <audio id="ayanokoji-voice" preload="auto">
         <source src="ayanokoji-voice.mp3" type="audio/mpeg">
     </audio>
@@ -47,7 +52,7 @@
             </div>
         </div>
         
-        <!-- مؤشر الصوت المتحرك (يظهر عند تكلم أيانوكوجي) -->
+        <!-- مؤشر الصوت المتحرك -->
         <div class="voice-indicator" id="voice-indicator">
             <span class="voice-bar"></span>
             <span class="voice-bar"></span>
@@ -80,6 +85,7 @@
         </div>
     </div>
 
+    <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/chess.js"></script>
     <script src="js/chessboard-1.0.0.js"></script>
