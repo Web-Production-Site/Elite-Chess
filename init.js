@@ -4,7 +4,7 @@
 
 var game = new Chess();
 var selectedSquare = null;
-var firstMoveMade = false; // ✅ متغير لتتبع أول حركة
+var ayanokojiFirstMoveMade = false; // لتتبع أول حركة لأيانوكوجي
 
 var board = Chessboard('board-container', {
     draggable: true,
@@ -32,14 +32,6 @@ var board = Chessboard('board-container', {
         
         if (typeof playMoveSound === 'function') playMoveSound();
         
-        // ✅ تشغيل صوت أيانوكوجي بعد أول حركة من اللاعب
-        if (!firstMoveMade) {
-            firstMoveMade = true;
-            setTimeout(function() {
-                if (typeof playAyanokojiVoice === 'function') playAyanokojiVoice();
-            }, 500);
-        }
-        
         removeMoveIndicators();
         selectedSquare = null;
         
@@ -64,7 +56,6 @@ $(document).on('click', '.square-55d63', function(e) {
     
     var piece = game.get(square);
     
-    // 1. النقر على نقطة حركة
     if (selectedSquare && $(this).is('.move-normal, .move-capture, .move-castle')) {
         var move = game.move({
             from: selectedSquare,
@@ -74,14 +65,6 @@ $(document).on('click', '.square-55d63', function(e) {
         
         if (move !== null) {
             if (typeof playMoveSound === 'function') playMoveSound();
-            
-            // ✅ تشغيل صوت أيانوكوجي بعد أول حركة من اللاعب
-            if (!firstMoveMade) {
-                firstMoveMade = true;
-                setTimeout(function() {
-                    if (typeof playAyanokojiVoice === 'function') playAyanokojiVoice();
-                }, 500);
-            }
             
             board.position(game.fen());
             removeMoveIndicators();
@@ -96,7 +79,6 @@ $(document).on('click', '.square-55d63', function(e) {
         }
     }
     
-    // 2. النقر على قطعة اللاعب
     if (piece && piece.color === playerColor) {
         if (selectedSquare === square) {
             selectedSquare = null;
@@ -108,7 +90,6 @@ $(document).on('click', '.square-55d63', function(e) {
         return;
     }
     
-    // 3. إلغاء التحديد
     selectedSquare = null;
     removeMoveIndicators();
 });
@@ -149,6 +130,14 @@ function makeAyanokojiMove() {
             board.position(game.fen());
             
             if (typeof playMoveSound === 'function') playMoveSound();
+            
+            // ✅ تشغيل صوت أيانوكوجي عند أول حركة يقوم بها هو
+            if (!ayanokojiFirstMoveMade) {
+                ayanokojiFirstMoveMade = true;
+                setTimeout(function() {
+                    if (typeof playAyanokojiVoice === 'function') playAyanokojiVoice();
+                }, 300);
+            }
             
             updateCheckStatus();
         }
@@ -196,14 +185,13 @@ function getKingSquare(color) {
     return null;
 }
 
-// ====== إعادة تعيين أول حركة للمباراة الجديدة ======
-function resetFirstMove() {
-    firstMoveMade = false;
+// ====== إعادة تعيين لأول حركة ======
+function resetAyanokojiFirstMove() {
+    ayanokojiFirstMoveMade = false;
 }
 
 $(window).resize(function() {
     board.resize();
 });
 
-// تصدير الدالة
-window.resetFirstMove = resetFirstMove;
+window.resetAyanokojiFirstMove = resetAyanokojiFirstMove;
