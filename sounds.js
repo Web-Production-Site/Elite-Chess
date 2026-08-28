@@ -1,5 +1,5 @@
 // ==========================================
-// نظام إدارة الأصوات (نسخة التشخيص والإصلاح)
+// نظام إدارة الأصوات (النسخة المحصّنة النهائية)
 // ==========================================
 
 const bgMusic = document.getElementById('bg-music');
@@ -7,12 +7,9 @@ const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 let audioContext = null;
 
-// 1. فحص وجود الملف وإعداد الصوت
 if (bgMusic) {
     bgMusic.volume = 0.28; // 28%
-    console.log("✅ تم العثور على عنصر الموسيقى في HTML.");
-} else {
-    console.error("❌ خطأ فادح: لم يتم العثور على <audio id='bg-music'> في index.html");
+    console.log("✅ تم العثور على عنصر الموسيقى.");
 }
 
 if (ayanokojiVoice) {
@@ -27,21 +24,28 @@ function initAudioContext() {
     }
 }
 
-// 2. دالة التشغيل القسلية مع تقرير الأخطاء
+// دالة التشغيل المحصّنة
 function forcePlayMusic() {
     if (!bgMusic) return;
     
-    console.log("🔄 جاري محاولة تشغيل الموسيقى...");
+    console.log("🔄 جاري فرض تشغيل الموسيقى...");
+    
+    // إعادة تحميل الملف للتأكد من أنه ليس عالقاً في الذاكرة
+    bgMusic.load(); 
     
     bgMusic.play().then(() => {
-        console.log("🎉 نجاح! موسيقى الخلفية تعمل الآن.");
+        console.log("🎉 نجاح! الموسيقى تعمل الآن.");
     }).catch(error => {
-        console.error("⛔ فشل تشغيل الموسيقى. التفاصيل:", error);
-        console.error("💡 الحل: تأكد أن اسم الملف في GitHub هو 'bg-music.mp3' بحروف صغيرة تماماً (لا يوجد B كبيرة).");
+        console.error("⛔ فشل التشغيل. السبب:", error.name);
+        if (error.name === 'NotAllowedError') {
+            console.log("💡 المتصفح ينتظر نقرة أخرى. انقر في أي مكان.");
+        } else if (error.name === 'NotSupportedError' || error.message.includes('404')) {
+            console.error("❌ الملف غير موجود أو صيغته خاطئة. تأكد أن الاسم هو bg-music.mp3 بحروف صغيرة تماماً.");
+        }
     });
 }
 
-// 3. ربط التشغيل بكل أنواع النقر الممكنة لضمان العمل
+// ربط التشغيل بكل أنواع النقر الممكنة
 document.addEventListener('click', function() {
     initAudioContext();
     forcePlayMusic();
@@ -52,13 +56,8 @@ document.addEventListener('touchstart', function() {
     forcePlayMusic();
 }, { once: true });
 
-// محاولة إضافية عند تحميل الصفحة (قد تنجح في بعض المتصفحات)
-window.addEventListener('load', () => {
-    setTimeout(forcePlayMusic, 1500);
-});
-
 // ==========================================
-// باقي وظائف الصوت (حركة القطع وأياناتكوجي)
+// باقي وظائف الصوت
 // ==========================================
 
 function playMoveSound() {
