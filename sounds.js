@@ -1,101 +1,25 @@
-// ==========================================
-// نظام إدارة الأصوات (موسيقى رقمية + مؤثرات)
-// ==========================================
-
 let audioContext = null;
-let bgMusicStarted = false;
-let bgMusicNodes = [];
 
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 
-// ✅ ضبط مستويات الصوت
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.20; // 20% لصوت أيانوكوجي
+// ✅ صوت أيانوكوجي 20%
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.20;
 
-// ==========================================
-// تهيئة AudioContext
-// ==========================================
 function initAudioContext() {
     if (!audioContext) {
         try {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) {
-            console.log('Web Audio API غير مدعوم');
-        }
+        } catch (e) {}
     }
 }
 
-// ==========================================
-// موسيقى خلفية رقمية هادئة (45%)
-// ==========================================
-function startBgMusic() {
-    if (bgMusicStarted || !audioContext) return;
-    
-    // Gain رئيسي للموسيقى - 45%
-    const masterGain = audioContext.createGain();
-    masterGain.gain.value = 0.45;
-    masterGain.connect(audioContext.destination);
-    
-    // فلتر تمرير منخفض لجعل الصوت دافئاً وناعماً
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 400;
-    filter.Q.value = 0.7;
-    filter.connect(masterGain);
-    
-    // نغمة 1: C2 (65.41 Hz) - عميقة جداً
-    const osc1 = audioContext.createOscillator();
-    osc1.type = 'sine';
-    osc1.frequency.value = 65.41;
-    const gain1 = audioContext.createGain();
-    gain1.gain.value = 0.6;
-    osc1.connect(gain1); gain1.connect(filter); osc1.start();
-    bgMusicNodes.push(osc1);
-    
-    // نغمة 2: G2 (98 Hz) - خامسة
-    const osc2 = audioContext.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = 98;
-    const gain2 = audioContext.createGain();
-    gain2.gain.value = 0.4;
-    osc2.connect(gain2); gain2.connect(filter); osc2.start();
-    bgMusicNodes.push(osc2);
-    
-    // نغمة 3: E3 (164.81 Hz) - ثالثة (تضيف جمالاً)
-    const osc3 = audioContext.createOscillator();
-    osc3.type = 'sine';
-    osc3.frequency.value = 164.81;
-    const gain3 = audioContext.createGain();
-    gain3.gain.value = 0.2;
-    osc3.connect(gain3); gain3.connect(filter); osc3.start();
-    bgMusicNodes.push(osc3);
-    
-    // تغيير بطيء جداً في النغمة الثالثة (كل 20 ثانية)
-    const now = audioContext.currentTime;
-    osc3.frequency.setValueAtTime(164.81, now);
-    osc3.frequency.linearRampToValueAtTime(196, now + 20); // G3
-    osc3.frequency.linearRampToValueAtTime(164.81, now + 40); // العودة
-    
-    bgMusicStarted = true;
-}
-
-function stopBgMusic() {
-    if (bgMusicNodes.length > 0) {
-        bgMusicNodes.forEach(node => { try { node.stop(); } catch(e) {} });
-        bgMusicNodes = [];
-        bgMusicStarted = false;
-    }
-}
-
-// ==========================================
-// صوت حركة القطعة - 20%
-// ==========================================
+// ✅ صوت حركة القطعة (20%)
 function playMoveSound() {
     initAudioContext();
     if (!audioContext) return;
     
     const now = audioContext.currentTime;
-    
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -113,27 +37,21 @@ function playMoveSound() {
     oscillator.stop(now + 0.08);
 }
 
-// ==========================================
-// صوت أيانوكوجي مع المؤشر البصري
-// ==========================================
+// ✅ صوت أيانوكوجي مع المؤشر البصري
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
         ayanokojiVoice.currentTime = 0;
         
-        // ✅ إظهار الخطوط المتحركة تحت الصورة
+        // إظهار الخطوط المتحركة
         if (voiceIndicator) voiceIndicator.classList.add('active');
         
-        ayanokojiVoice.play().then(() => {
-            console.log('بدأ صوت أيانوكوجي');
-        }).catch(err => {
-            console.log('تعذر تشغيل صوت أيانوكوجي:', err);
+        ayanokojiVoice.play().catch(err => {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         });
         
-        // ✅ إخفاء الخطوط عند انتهاء الصوت
+        // إخفاء الخطوط عند الانتهاء
         ayanokojiVoice.onended = function() {
             if (voiceIndicator) voiceIndicator.classList.remove('active');
-            console.log('انتهى صوت أيانوكوجي');
         };
     }
 }
@@ -146,20 +64,9 @@ function resetAyanokojiVoice() {
     if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
-// تشغيل الموسيقى عند أول تفاعل
-document.addEventListener('click', function() {
-    initAudioContext();
-    startBgMusic();
-}, { once: true });
+document.addEventListener('click', function() { initAudioContext(); }, { once: true });
+document.addEventListener('touchstart', function() { initAudioContext(); }, { once: true });
 
-document.addEventListener('touchstart', function() {
-    initAudioContext();
-    startBgMusic();
-}, { once: true });
-
-// تصدير الدوال
-window.startBgMusic = startBgMusic;
-window.stopBgMusic = stopBgMusic;
 window.playMoveSound = playMoveSound;
 window.playAyanokojiVoice = playAyanokojiVoice;
 window.resetAyanokojiVoice = resetAyanokojiVoice;
