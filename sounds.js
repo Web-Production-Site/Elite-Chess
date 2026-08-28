@@ -9,14 +9,16 @@ let bgMusicNodes = [];
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 
-// ✅ ضبط مستويات الصوت (تم التعديل ليكون صوت أيانوكوجي أوضح)
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.35; // رفعنا الصوت إلى 35% ليكون واضحاً وفخماً
+// ✅ ضبط مستويات الصوت
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.35; // 35% لصوت أيانوكوجي (واضح وفخم)
 
 function initAudioContext() {
     if (!audioContext) {
         try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)());
-        } catch (e) {}
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Web Audio API غير مدعوم');
+        }
     }
 }
 
@@ -26,12 +28,12 @@ function initAudioContext() {
 function startBgMusic() {
     if (bgMusicStarted || !audioContext) return;
     
-    // Gain رئيسي - 12% فقط (خافت جداً لكي لا يغطي على صوت أيانوكوجي)
+    // Gain رئيسي - 12% فقط (خافت جداً)
     const masterGain = audioContext.createGain();
-    masterGain.gain.value = 0.12; 
+    masterGain.gain.value = 0.12;
     masterGain.connect(audioContext.destination);
     
-    // فلتر تمرير منخفض (يجعل الصوت دافئاً وهادئاً جداً)
+    // فلتر تمرير منخفض (صوت دافئ وهادئ)
     const filter = audioContext.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.value = 400;
@@ -44,7 +46,9 @@ function startBgMusic() {
     osc1.frequency.value = 65.41;
     const gain1 = audioContext.createGain();
     gain1.gain.value = 0.5;
-    osc1.connect(gain1); gain1.connect(filter); osc1.start();
+    osc1.connect(gain1);
+    gain1.connect(filter);
+    osc1.start();
     bgMusicNodes.push(osc1);
     
     // نغمة 2: G2 (98 Hz) - خامسة
@@ -53,7 +57,9 @@ function startBgMusic() {
     osc2.frequency.value = 98;
     const gain2 = audioContext.createGain();
     gain2.gain.value = 0.4;
-    osc2.connect(gain2); gain2.connect(filter); osc2.start();
+    osc2.connect(gain2);
+    gain2.connect(filter);
+    osc2.start();
     bgMusicNodes.push(osc2);
     
     // نغمة 3: E3 (164.81 Hz) - ثالثة
@@ -62,29 +68,33 @@ function startBgMusic() {
     osc3.frequency.value = 164.81;
     const gain3 = audioContext.createGain();
     gain3.gain.value = 0.2;
-    osc3.connect(gain3); gain3.connect(filter); osc3.start();
+    osc3.connect(gain3);
+    gain3.connect(filter);
+    osc3.start();
     bgMusicNodes.push(osc3);
     
-    // تغيير بطيء جداً (كل 30 ثانية) لإعطاء شعور بالحياة
+    // تغيير بطيء جداً (كل 30 ثانية)
     const now = audioContext.currentTime;
     osc3.frequency.setValueAtTime(164.81, now);
     osc3.frequency.linearRampToValueAtTime(196, now + 30);
     osc3.frequency.linearRampToValueAtTime(164.81, now + 60);
     
     bgMusicStarted = true;
-    console.log('🎵 تم تشغيل الموسيقى الخلفية (مستوى منخفض 12%)');
+    console.log('🎵 تم تشغيل الموسيقى الخلفية (12%)');
 }
 
 function stopBgMusic() {
     if (bgMusicNodes.length > 0) {
-        bgMusicNodes.forEach(node => { try { node.stop(); } catch(e) {} });
+        bgMusicNodes.forEach(node => {
+            try { node.stop(); } catch(e) {}
+        });
         bgMusicNodes = [];
         bgMusicStarted = false;
     }
 }
 
 // ==========================================
-// صوت حركة القطعة (20%)
+// ♟️ صوت حركة القطعة (20%)
 // ==========================================
 function playMoveSound() {
     initAudioContext();
@@ -109,7 +119,7 @@ function playMoveSound() {
 }
 
 // ==========================================
-// صوت أيانوكوجي مع المؤشر البصري
+// 👁️ صوت أيانوكوجي مع المؤشر البصري
 // ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
@@ -118,6 +128,7 @@ function playAyanokojiVoice() {
         if (voiceIndicator) voiceIndicator.classList.add('active');
         
         ayanokojiVoice.play().catch(err => {
+            console.log('تعذر تشغيل صوت أيانوكوجي:', err);
             if (voiceIndicator) voiceIndicator.classList.remove('active');
         });
         
@@ -146,6 +157,7 @@ document.addEventListener('touchstart', function() {
     startBgMusic();
 }, { once: true });
 
+// تصدير الدوال
 window.startBgMusic = startBgMusic;
 window.stopBgMusic = stopBgMusic;
 window.playMoveSound = playMoveSound;
