@@ -1,15 +1,18 @@
 // ==========================================
-// نظام إدارة الأصوات - مع موسيقى خلفية هادئة
+// نظام إدارة الأصوات - مع فيديو خلفية ومؤشر صوتي
 // ==========================================
 
 let audioContext = null;
-let bgMusicStarted = false;
-let bgMusicNodes = [];
+let bgVideoStarted = false;
 
 // عناصر الصوت
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
-// ✅ صوت أيانوكوجي 18%
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.18;
+const bgAudioVideo = document.getElementById('bg-audio-video');
+const voiceIndicator = document.getElementById('voice-indicator');
+
+// ✅ ضبط مستويات الصوت
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.18; // 18%
+if (bgAudioVideo) bgAudioVideo.volume = 0.2; // 20%
 
 // ==========================================
 // تهيئة AudioContext
@@ -25,72 +28,23 @@ function initAudioContext() {
 }
 
 // ==========================================
-// موسيقى خلفية رقمية هادئة وجميلة
+// تشغيل فيديو الخلفية كصوت
 // ==========================================
 function startBgMusic() {
-    if (bgMusicStarted || !audioContext) return;
+    if (bgVideoStarted || !bgAudioVideo) return;
     
-    // Gain رئيسي للموسيقى - 20%
-    const masterGain = audioContext.createGain();
-    masterGain.gain.value = 0.2;
-    masterGain.connect(audioContext.destination);
-    
-    // فلتر تمرير منخفض لجعل الصوت دافئاً وناعماً
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 400;
-    filter.Q.value = 0.7;
-    filter.connect(masterGain);
-    
-    // نغمة 1: C2 (65.41 Hz) - عميقة جداً
-    const osc1 = audioContext.createOscillator();
-    osc1.type = 'sine';
-    osc1.frequency.value = 65.41;
-    const gain1 = audioContext.createGain();
-    gain1.gain.value = 0.6;
-    osc1.connect(gain1);
-    gain1.connect(filter);
-    osc1.start();
-    bgMusicNodes.push(osc1);
-    
-    // نغمة 2: G2 (98 Hz) - خامسة
-    const osc2 = audioContext.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = 98;
-    const gain2 = audioContext.createGain();
-    gain2.gain.value = 0.4;
-    osc2.connect(gain2);
-    gain2.connect(filter);
-    osc2.start();
-    bgMusicNodes.push(osc2);
-    
-    // نغمة 3: E3 (164.81 Hz) - ثالثة (تضيف جمالاً)
-    const osc3 = audioContext.createOscillator();
-    osc3.type = 'sine';
-    osc3.frequency.value = 164.81;
-    const gain3 = audioContext.createGain();
-    gain3.gain.value = 0.2;
-    osc3.connect(gain3);
-    gain3.connect(filter);
-    osc3.start();
-    bgMusicNodes.push(osc3);
-    
-    // تغيير بطيء جداً في النغمة الثالثة (كل 20 ثانية)
-    const now = audioContext.currentTime;
-    osc3.frequency.setValueAtTime(164.81, now);
-    osc3.frequency.linearRampToValueAtTime(196, now + 20); // G3
-    osc3.frequency.linearRampToValueAtTime(164.81, now + 40); // العودة
-    
-    bgMusicStarted = true;
+    bgAudioVideo.play().then(() => {
+        bgVideoStarted = true;
+        console.log('تم تشغيل صوت الخلفية من الفيديو');
+    }).catch(err => {
+        console.log('تعذر تشغيل فيديو الخلفية:', err);
+    });
 }
 
 function stopBgMusic() {
-    if (bgMusicNodes.length > 0) {
-        bgMusicNodes.forEach(node => {
-            try { node.stop(); } catch(e) {}
-        });
-        bgMusicNodes = [];
-        bgMusicStarted = false;
+    if (bgAudioVideo) {
+        bgAudioVideo.pause();
+        bgVideoStarted = false;
     }
 }
 
@@ -121,14 +75,28 @@ function playMoveSound() {
 }
 
 // ==========================================
-// صوت أيانوكوجي
+// ✅ صوت أيانوكوجي مع مؤشر بصري
 // ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
         ayanokojiVoice.currentTime = 0;
-        ayanokojiVoice.play().catch(err => {
+        
+        // ✅ إظهار مؤشر الصوت المتحرك
+        if (voiceIndicator) voiceIndicator.classList.add('active');
+        
+        ayanokojiVoice.play().then(() => {
+            console.log('بدأ صوت أيانوكوجي');
+        }).catch(err => {
             console.log('تعذر تشغيل صوت أيانوكوجي:', err);
+            // إخفاء المؤشر إذا فشل التشغيل
+            if (voiceIndicator) voiceIndicator.classList.remove('active');
         });
+        
+        // ✅ إخفاء المؤشر عند انتهاء الصوت
+        ayanokojiVoice.onended = function() {
+            if (voiceIndicator) voiceIndicator.classList.remove('active');
+            console.log('انتهى صوت أيانوكوجي');
+        };
     }
 }
 
@@ -137,6 +105,8 @@ function resetAyanokojiVoice() {
         ayanokojiVoice.pause();
         ayanokojiVoice.currentTime = 0;
     }
+    // ✅ إخفاء المؤشر عند إعادة التعيين
+    if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
 // تشغيل الموسيقى عند أول تفاعل
