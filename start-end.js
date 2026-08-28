@@ -17,7 +17,6 @@ const pawnSVG = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" view
 function changePawnColor() {
     const randomColor = pawnColors[Math.floor(Math.random() * pawnColors.length)];
     const strokeColor = randomColor.includes('0, 0, 0') ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)';
-    
     const svg = pawnSVG.replace(/COLOR/g, randomColor).replace(/STROKE/g, strokeColor);
     $('#start-pawn').css('background-image', `url('${svg}')`);
 }
@@ -33,20 +32,14 @@ $('#start-screen').on('click', function() {
     }
 });
 
-$('#white-option').on('click', function() {
-    startGame('w');
-});
-
-$('#black-option').on('click', function() {
-    startGame('b');
-});
+$('#white-option').on('click', function() { startGame('w'); });
+$('#black-option').on('click', function() { startGame('b'); });
 
 function startGame(color) {
     playerColor = color;
     gameStarted = true;
     
-    // ✅ إعادة تعيين أول حركة للمباراة الجديدة
-    if (typeof resetFirstMove === 'function') resetFirstMove();
+    if (typeof resetAyanokojiFirstMove === 'function') resetAyanokojiFirstMove();
     if (typeof resetAyanokojiVoice === 'function') resetAyanokojiVoice();
     
     $('#color-selection').fadeOut(300, function() {
@@ -54,19 +47,14 @@ function startGame(color) {
         $('#ayanokoji-profile').css('display', 'flex').hide().fadeIn(300);
         
         setTimeout(function() {
-            if (typeof board !== 'undefined') {
-                board.resize();
-            }
+            if (typeof board !== 'undefined') board.resize();
         }, 350);
 
         if (typeof game !== 'undefined' && typeof board !== 'undefined') {
             game.reset();
             board.orientation(color === 'w' ? 'white' : 'black');
             board.start();
-            
-            if (typeof removeMoveIndicators === 'function') {
-                removeMoveIndicators();
-            }
+            if (typeof removeMoveIndicators === 'function') removeMoveIndicators();
         }
         
         if (playerColor === 'b') {
@@ -105,7 +93,6 @@ function showEndScreen(result) {
     $endTitle.text(data.title);
     $endQuote.text(data.quote);
     $endScreen.addClass(result);
-    
     $endScreen.fadeIn(400);
 }
 
