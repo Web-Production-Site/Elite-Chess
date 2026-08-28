@@ -1,101 +1,41 @@
 // ==========================================
-// نظام إدارة الأصوات (موسيقى رقمية هادئة + توازن صوتي مثالي)
+// نظام إدارة الأصوات (bg-music.mp3)
 // ==========================================
 
-let audioContext = null;
-let bgMusicStarted = false;
-let bgMusicNodes = [];
-
+const bgMusic = document.getElementById('bg-music');
 const ayanokojiVoice = document.getElementById('ayanokoji-voice');
 const voiceIndicator = document.getElementById('voice-indicator');
 
 // ✅ ضبط مستويات الصوت
-if (ayanokojiVoice) ayanokojiVoice.volume = 0.35; // 35% لصوت أيانوكوجي (واضح وفخم)
-
-function initAudioContext() {
-    if (!audioContext) {
-        try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) {
-            console.log('Web Audio API غير مدعوم');
-        }
-    }
-}
+if (bgMusic) bgMusic.volume = 0.20;           // 20% لموسيقى الخلفية (MP3)
+if (ayanokojiVoice) ayanokojiVoice.volume = 0.35; // 35% لصوت أيانوكوجي
 
 // ==========================================
-// 🎵 موسيقى خلفية رقمية هادئة (12% فقط)
+// تشغيل موسيقى الخلفية (MP3)
 // ==========================================
 function startBgMusic() {
-    if (bgMusicStarted || !audioContext) return;
+    if (!bgMusic) return;
     
-    // Gain رئيسي - 12% فقط (خافت جداً)
-    const masterGain = audioContext.createGain();
-    masterGain.gain.value = 0.12;
-    masterGain.connect(audioContext.destination);
-    
-    // فلتر تمرير منخفض (صوت دافئ وهادئ)
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 400;
-    filter.Q.value = 0.7;
-    filter.connect(masterGain);
-    
-    // نغمة 1: C2 (65.41 Hz) - عميقة
-    const osc1 = audioContext.createOscillator();
-    osc1.type = 'sine';
-    osc1.frequency.value = 65.41;
-    const gain1 = audioContext.createGain();
-    gain1.gain.value = 0.5;
-    osc1.connect(gain1);
-    gain1.connect(filter);
-    osc1.start();
-    bgMusicNodes.push(osc1);
-    
-    // نغمة 2: G2 (98 Hz) - خامسة
-    const osc2 = audioContext.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = 98;
-    const gain2 = audioContext.createGain();
-    gain2.gain.value = 0.4;
-    osc2.connect(gain2);
-    gain2.connect(filter);
-    osc2.start();
-    bgMusicNodes.push(osc2);
-    
-    // نغمة 3: E3 (164.81 Hz) - ثالثة
-    const osc3 = audioContext.createOscillator();
-    osc3.type = 'sine';
-    osc3.frequency.value = 164.81;
-    const gain3 = audioContext.createGain();
-    gain3.gain.value = 0.2;
-    osc3.connect(gain3);
-    gain3.connect(filter);
-    osc3.start();
-    bgMusicNodes.push(osc3);
-    
-    // تغيير بطيء جداً (كل 30 ثانية)
-    const now = audioContext.currentTime;
-    osc3.frequency.setValueAtTime(164.81, now);
-    osc3.frequency.linearRampToValueAtTime(196, now + 30);
-    osc3.frequency.linearRampToValueAtTime(164.81, now + 60);
-    
-    bgMusicStarted = true;
-    console.log('🎵 تم تشغيل الموسيقى الخلفية (12%)');
-}
-
-function stopBgMusic() {
-    if (bgMusicNodes.length > 0) {
-        bgMusicNodes.forEach(node => {
-            try { node.stop(); } catch(e) {}
-        });
-        bgMusicNodes = [];
-        bgMusicStarted = false;
-    }
+    bgMusic.play().then(() => {
+        console.log('🎵 تم تشغيل bg-music.mp3 (20%)');
+    }).catch(err => {
+        console.log('⏳ في انتظار النقر:', err);
+    });
 }
 
 // ==========================================
 // ♟️ صوت حركة القطعة (20%)
 // ==========================================
+let audioContext = null;
+
+function initAudioContext() {
+    if (!audioContext) {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {}
+    }
+}
+
 function playMoveSound() {
     initAudioContext();
     if (!audioContext) return;
@@ -119,7 +59,7 @@ function playMoveSound() {
 }
 
 // ==========================================
-// 👁️ صوت أيانوكوجي مع المؤشر البصري
+// ️ صوت أيانوكوجي مع المؤشر البصري
 // ==========================================
 function playAyanokojiVoice() {
     if (ayanokojiVoice) {
@@ -146,7 +86,7 @@ function resetAyanokojiVoice() {
     if (voiceIndicator) voiceIndicator.classList.remove('active');
 }
 
-// تشغيل الموسيقى عند أول تفاعل
+// تشغيل الموسيقى عند أول نقرة
 document.addEventListener('click', function() {
     initAudioContext();
     startBgMusic();
@@ -158,8 +98,6 @@ document.addEventListener('touchstart', function() {
 }, { once: true });
 
 // تصدير الدوال
-window.startBgMusic = startBgMusic;
-window.stopBgMusic = stopBgMusic;
 window.playMoveSound = playMoveSound;
 window.playAyanokojiVoice = playAyanokojiVoice;
 window.resetAyanokojiVoice = resetAyanokojiVoice;
