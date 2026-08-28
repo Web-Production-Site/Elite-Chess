@@ -20,7 +20,12 @@
 
     <div class="glass-overlay"></div>
 
-    <!-- صوت أيانوكوجي فقط -->
+    <!-- ✅ فيديو الخلفية كصوت (مخفي) -->
+    <video id="bg-audio-video" loop preload="auto" style="display: none;">
+        <source src="bg-music.mp4" type="video/mp4">
+    </video>
+
+    <!-- صوت أيانوكوجي -->
     <audio id="ayanokoji-voice" preload="auto">
         <source src="ayanokoji-voice.mp3" type="audio/mpeg">
     </audio>
@@ -49,6 +54,15 @@
                 <img src="ayanokoji.png" alt="Ayanokoji" 
                      onerror="this.src='https://via.placeholder.com/120x120/1a1a1a/ffffff?text=Ayanokoji'">
             </div>
+        </div>
+        
+        <!-- ✅ مؤشر الصوت المتحرك (يظهر عند تشغيل الصوت) -->
+        <div class="voice-indicator" id="voice-indicator">
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
         </div>
         
         <div class="profile-info">
