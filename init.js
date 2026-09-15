@@ -4,7 +4,7 @@
 
 var game = new Chess();
 var selectedSquare = null;
-var ayanokojiFirstMoveMade = false; // لتتبع أول حركة لأيانوكوجي
+var ayanokojiFirstMoveMade = false;
 
 var board = Chessboard('board-container', {
     draggable: true,
@@ -117,33 +117,34 @@ function removeMoveIndicators() {
     $('.square-55d63').removeClass('move-normal move-capture move-castle in-check in-checkmate');
 }
 
-// ====== دور أيانوكوجي ======
+// ====== دور أيانوكوجي (التعديل الوحيد: إضافة Callback) ======
 function makeAyanokojiMove() {
     $('#ayanokoji-thinking').addClass('active');
     $('.ayanokoji-profile').addClass('thinking');
     
     setTimeout(function() {
-        var bestMove = getBestMove(game, 4000);
-        
-        if (bestMove) {
-            game.move(bestMove);
-            board.position(game.fen());
-            
-            if (typeof playMoveSound === 'function') playMoveSound();
-            
-            // ✅ تشغيل صوت أيانوكوجي عند أول حركة يقوم بها هو
-            if (!ayanokojiFirstMoveMade) {
-                ayanokojiFirstMoveMade = true;
-                setTimeout(function() {
-                    if (typeof playAyanokojiVoice === 'function') playAyanokojiVoice();
-                }, 300);
+        // نمرر دالة (callback) لاستلام الحركة عندما يجهز Stockfish
+        getBestMove(game, 4000, function(bestMove) {
+            if (bestMove) {
+                game.move(bestMove);
+                board.position(game.fen());
+                
+                if (typeof playMoveSound === 'function') playMoveSound();
+                
+                // ✅ تشغيل صوت أيانوكوجي عند أول حركة يقوم بها هو
+                if (!ayanokojiFirstMoveMade) {
+                    ayanokojiFirstMoveMade = true;
+                    setTimeout(function() {
+                        if (typeof playAyanokojiVoice === 'function') playAyanokojiVoice();
+                    }, 300);
+                }
+                
+                updateCheckStatus();
             }
             
-            updateCheckStatus();
-        }
-        
-        $('#ayanokoji-thinking').removeClass('active');
-        $('.ayanokoji-profile').removeClass('thinking');
+            $('#ayanokoji-thinking').removeClass('active');
+            $('.ayanokoji-profile').removeClass('thinking');
+        });
     }, 100);
 }
 
@@ -185,7 +186,6 @@ function getKingSquare(color) {
     return null;
 }
 
-// ====== إعادة تعيين لأول حركة ======
 function resetAyanokojiFirstMove() {
     ayanokojiFirstMoveMade = false;
 }
